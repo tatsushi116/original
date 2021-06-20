@@ -10,17 +10,17 @@ class PostsController < ApplicationController
 
   def show
     @post = Post.find(params[:id])
+    @comments = @tweet.comments
+    @comment = Comment.new
   end
 
   def create
-    Post.create(post_parameter)
-    redirect_to posts_path
-  end
-
-  def destroy
-    @post = Post.find(params[:id])
-    @post.destroy
-    redirect_to posts_path, notice:"削除しました"
+    post = Post.new(post_params)
+    if post.save
+      redirect_to :action => "index"
+    else
+      redirect_to :action => "new"
+    end
   end
 
   def edit
@@ -28,20 +28,28 @@ class PostsController < ApplicationController
   end
 
   def update
-    @post = Post.find(params[:id])
-    if @post.update(post_parameter)
-      redirect_to posts_path, notice: "編集しました"
+    post = Post.find(params[:id])
+    if post.update(post_params)
+      redirect_to :action => "show", :id => post.id
     else
-      render 'edit'
+      redirect_to :action => "new"
     end
   end
 
-  private
+  def destroy
+    post = Post.find(params[:id])
+    post.destroy
+    redirect_to action: :index
+  end
 
-  def post_parameter
+  before_action :authenticate_user!
+
+  private
+  def post_params
     params.require(:post).permit(:match, :start_time)
   end
 
+  
 
 end
 
