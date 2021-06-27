@@ -11,7 +11,11 @@ class User < ApplicationRecord
          def already_liked?(post)
           self.likes.exists?(post_id: post.id)
         end
-       
+        
+  devise :database_authenticatable, :registerable,
+        :recoverable, :rememberable, :trackable, :validatable
+        has_many :messages, dependent: :destroy
+        has_many :entries, dependent: :destroy
 end
 
 
